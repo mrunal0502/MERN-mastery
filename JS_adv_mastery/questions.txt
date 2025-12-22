@@ -1,0 +1,299 @@
+Absolutely, Mrunal — happy to dial it in. Let’s **build you up gradually** from fundamentals to FAANG-ready async/event loop skills with **bite-sized assignments**, each with clear goals, hints, and acceptance criteria. We’ll keep the cognitive load reasonable and steadily raise the bar.
+
+> **Format**: 4 Levels → each level has \~5 short tasks.  
+> **You’ll get:** What to build, what to learn, hints, and how you’ll know you’ve nailed it.
+
+***
+
+## 🌱 Level 0 — Core Asynchrony & Ordering (Warm-up)
+
+### Task 0.1 — Basic `setTimeout` Ordering
+
+**Build:** A file `basic-timeout.js` that logs:
+
+1.  “Start”
+2.  Two `setTimeout` calls with delays 0ms and 10ms
+3.  “End”
+
+**Learn:** Synchronous vs asynchronous; timers don’t run “immediately”.
+
+**Hint:**
+
+```js
+console.log('Start');
+setTimeout(() => console.log('Timeout 0'), 0);
+setTimeout(() => console.log('Timeout 10'), 10);
+console.log('End');
+```
+
+**Acceptance:** Output order must be: `Start` → `End` → `Timeout 0` → `Timeout 10`.
+
+***
+
+### Task 0.2 — `Promise.then` vs `setTimeout`
+
+**Build:** `micro-vs-macro.js` — log the order using:
+
+*   `console.log('A')`
+*   `setTimeout(() => console.log('B'), 0)`
+*   `Promise.resolve().then(() => console.log('C'))`
+*   `console.log('D')`
+
+**Learn:** Microtasks (`Promise.then`) run before macrotasks (`setTimeout`).
+
+**Acceptance:** Order must be: `A` → `D` → `C` → `B`.
+
+***
+
+### Task 0.3 — Chaining Promises
+
+**Build:** `simple-chain.js` that returns a Promise resolving `"data"` and chains:
+`.then(d => d.toUpperCase()).then(d => console.log(d))`
+
+**Learn:** Fluent chaining and transformation.
+
+**Acceptance:** Final output is `DATA` without “UnhandledPromiseRejectionWarning”.
+
+***
+
+### Task 0.4 — `async/await` Basics
+
+**Build:** `await-basics.js` with:
+
+*   `async function getUser()` that `await`s a Promise after 300ms
+*   Log start/end around `await` to see pause behavior
+
+**Learn:** `await` pauses inside async functions only; not blocking global thread.
+
+**Acceptance:** “Before await” logs before the resolve; “After await” logs after.
+
+***
+
+### Task 0.5 — Error Handling with Promises
+
+**Build:** `error-handling.js`:
+
+*   A Promise that rejects with `"Boom"`.
+*   Handle with `.catch` and also with `async/await try/catch`.
+
+**Learn:** Two idioms to handle async errors.
+
+**Acceptance:** No unhandled rejection; logged error messages are clear in both styles.
+
+***
+
+## 🌿 Level 1 — Practical Patterns & Data Flow
+
+### Task 1.1 — Sequential vs Parallel
+
+**Build:** `seq-vs-par.js`:
+
+*   Three functions `f1,f2,f3` that resolve after random delays (100–500ms).
+*   Run them sequentially (`await f1(); await f2(); await f3()`) vs parallel (`await Promise.all([f1(), f2(), f3()])`).
+*   Measure time with `Date.now()`.
+
+**Learn:** Throughput gains with parallelization; correctness with sequential dependencies.
+
+**Acceptance:** Parallel time is ≈ max(single delays), sequential ≈ sum(delays).
+
+***
+
+### Task 1.2 — Promise.all — Handle Partial Failure
+
+**Build:** `all-partial.js`:
+
+*   `getA()` resolves, `getB()` rejects, `getC()` resolves.
+*   Use `Promise.all` and then `Promise.allSettled` to compare.
+
+**Learn:** How `all` fails fast; `allSettled` collects outcomes.
+
+**Acceptance:** `all` should throw; `allSettled` returns array of `{status, value|reason}`.
+
+***
+
+### Task 1.3 — Debounce (Manual)
+
+**Build:** `debounce.js`:
+
+*   Implement `debounce(fn, delay)` returning a debounced version.
+*   Test with simulated rapid calls (e.g., calling every 50ms with delay=200ms).
+
+**Learn:** Timing control and cleanup with `clearTimeout`.
+
+**Acceptance:** Only the **last** call triggers after idle period.
+
+***
+
+### Task 1.4 — Throttle (Leading/Trailing)
+
+**Build:** `throttle.js`:
+
+*   Implement `throttle(fn, delay, {leading=true, trailing=true})`.
+*   Verify both modes with logs.
+
+**Learn:** Distinguish leading/trailing calls; manage state.
+
+**Acceptance:** Behavior matches options; no extra invokes.
+
+***
+
+### Task 1.5 — Retry with Fixed Backoff
+
+**Build:** `retry-basic.js`:
+
+*   `retry(fn, retries, delayMs)` that retries a flaky task (50% failure) with fixed delays.
+
+**Learn:** Compose control around promises, respect rejections.
+
+**Acceptance:** Retries stop after limit; return final value or last error.
+
+***
+
+## 🌳 Level 2 — Event Loop Nuances & Cancellation
+
+### Task 2.1 — Microtask Queue Saturation
+
+**Build:** `micro-saturation.js`:
+
+*   Schedule a loop of 10,000 `Promise.resolve().then(...)` logging count every 1000.
+
+**Learn:** Microtasks can starve macrotasks if misused.
+
+**Acceptance:** Demonstrate that `setTimeout` logs are delayed until microtasks finish.
+
+***
+
+### Task 2.2 — Node: `process.nextTick` vs `Promise.then`
+
+**Build:** `node-order.js` (run in Node):
+
+*   Schedule both `nextTick` and `then` and show ordering.
+
+**Learn:** In Node, `nextTick` runs before `Promise.then`.
+
+**Acceptance:** Logs show `nextTick` before `then`, and both before `setTimeout`.
+
+***
+
+### Task 2.3 — AbortController with `fetch`
+
+**Build:** `abort-fetch.js`:
+
+*   Start a `fetch` to a slow endpoint (simulate with `setTimeout`-based mock or use Node’s `fetch` to a delayed URL if available).
+*   Abort after 100ms using `AbortController`.
+
+**Learn:** Cooperative cancellation and cleanup.
+
+**Acceptance:** Promise rejects with an `AbortError` (or clear error), no leaks.
+
+*(If you don’t want network: simulate a cancellable task using setTimeout and an `abort` flag.)*
+
+***
+
+### Task 2.4 — Exponential Backoff + Jitter
+
+**Build:** `retry-advanced.js`:
+
+*   `retry(fn, {retries:5, baseMs:100, factor:2, jitter:true})`.
+*   Log attempt timestamps; verify increasing delays with randomness.
+
+**Learn:** Real-world retry strategy to avoid thundering herds.
+
+**Acceptance:** Delay sequence respects bounds; final success/failure consistent.
+
+***
+
+### Task 2.5 — Promise Pool (Concurrency Limit = 2)
+
+**Build:** `pool-2.js`:
+
+*   Given 10 tasks with random delays, ensure at most 2 run concurrently.
+
+**Learn:** Concurrency control to protect resources.
+
+**Acceptance:** Log active count—never exceeds 2; results retain input order.
+
+***
+
+## 🌲 Level 3 — Streams, Backpressure & Robust Services
+
+### Task 3.1 — Read → Transform → Write (Node Streams)
+
+**Build:** `pipeline-uppercase.js`:
+
+*   Use `fs.createReadStream` on a text file, a Transform that uppercases, and `fs.createWriteStream`.
+*   Use `pipeline` from `'stream/promises'`.
+
+**Learn:** Backpressure propagation; stream error handling.
+
+**Acceptance:** Output file is uppercase; program exits cleanly on error.
+
+***
+
+### Task 3.2 — Rate-Limited Transform
+
+**Build:** `rate-limit.js`:
+
+*   Transform that passes chunks but waits to keep throughput near \~64KB/s.
+
+**Learn:** Controlling flow respecting backpressure.
+
+**Acceptance:** Measured time aligns with expected throughput.
+
+***
+
+### Task 3.3 — Ordered Parallel Line Processing
+
+**Build:** `ordered-parallel.js`:
+
+*   Read file line by line, process lines in parallel (limit=3), write results keeping original order.
+
+**Learn:** Combining concurrency with order preservation.
+
+**Acceptance:** Output order exactly matches input order.
+
+***
+
+### Task 3.4 — Express Async Error Handler
+
+**Build:** `server.js`:
+
+*   Minimal Express app with `asyncHandler` wrapper.
+*   One route that throws asynchronously, ensures error middleware handles it.
+
+**Learn:** No unhandled rejections, clean API errors.
+
+**Acceptance:** `GET /boom` returns 500 with JSON `{error: '...'};` logs show stack once.
+
+***
+
+### Task 3.5 — React: Cancel In-flight Requests
+
+**Build:** `UserList.jsx`:
+
+*   Fetch users on filter change; cancel previous request on new filter or unmount using `AbortController`.
+
+**Learn:** Avoid race conditions and stale updates.
+
+**Acceptance:** No “setState on unmounted” warnings; latest request wins.
+
+***
+
+## 🛠 How I’ll support you
+
+*   If you want, I can **scaffold a GitHub-ready repo** with:
+    *   Folder structure for Levels 0–3
+    *   `package.json` with scripts (`test`, `start`)
+    *   A couple of **starter tests** (Jest) for key tasks
+    *   Minimal examples and TODOs in each file
+
+*   We can go step-by-step: you complete a task, share your code/output, and I’ll **review and suggest improvements** (performance, correctness, edge cases).
+
+***
+
+## ✅ What to tackle first
+
+Start with **Level 0 Task 0.1 and 0.2** (you’ll get immediate insight into ordering).  
+Once done, we’ll build momentum into **Level 1** where things get practical.
+
+Would you like me to set up the repo scaffolding and include starter templates for **Level 0 & 1** right away? Or do you want to begin with Task 0.1 and share your output so I can confirm the behavior and guide you to 0.2?
