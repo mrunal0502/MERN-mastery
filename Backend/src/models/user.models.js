@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { randomBytes, createHash } from "crypto";
 
 const userSchema = new Schema(
   {
@@ -64,12 +65,11 @@ const userSchema = new Schema(
   },
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   if (!this.isModified("password")) {
-    return next();
+    return;
   }
   this.password = await bcrypt.hash(this.password, 10);
-  next();
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
@@ -105,13 +105,10 @@ userSchema.methodsgenerateRefreshToken = function () {
 };
 
 userSchema.methods.generateTemporaryToken = function () {
-  const unHashedToken = crypto.randomBytes(20).toString("hex");
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(unHashedToken)
-    .digest("hex");
+  const unHashedToken = randomBytes(20).toString("hex");
+  const hashedToken = createHash("sha256").update(unHashedToken).digest("hex");
 
-  const tokenExpiry = Date.now() + 20 * 60 * 1000; //20 minutes from now
+  const tokenExpiry = new Date(Date.now() + 20 * 60 * 1000); //20 minutes from now
 
   return { hashedToken, unHashedToken, tokenExpiry };
 };
