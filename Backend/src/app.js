@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
-app.get("/", (req, res) => {++
+app.get("/", (req, res) => {
   res.send("Welcome to basecampy");
 });
 
