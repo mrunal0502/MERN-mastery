@@ -4,7 +4,7 @@ export const UserRolesEnum = {
   MEMBER: "member",
 };
 
-export const AvailableUserRole = Object.values(UserRolesEnum);
+export const AvailableUserRole = Object.values(UserRolesEnum); //creates the array of the enum
 
 export const TaskStatusEnum = {
   TODO: "todo",
