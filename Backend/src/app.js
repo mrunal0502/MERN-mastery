@@ -30,6 +30,11 @@ import healthCheckRouter from "./routes/healthcheck.routes.js";
 
 import authRouter from "./routes/auth.routes.js";
 
+import projectRouter from "./routes/project.routes.js";
+
+// use the routes
+app.use("/api/v1/projects", projectRouter);
+
 // use the routes
 app.use("/api/v1/auth", authRouter);
 
