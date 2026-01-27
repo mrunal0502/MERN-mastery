@@ -1,0 +1,19 @@
+{
+  "name": "mega_project_in_backend_mongodb",
+  "version": "1.0.0",
+  "description": "Express crash course with postman testing",
+  "license": "ISC",
+  "author": "Mrunal Rawade",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "morgan": "^1.10.1",
+    "nodemon": "^3.1.11",
+    "winston": "^3.19.0"
+  }
+}
