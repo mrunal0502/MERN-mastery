@@ -147,22 +147,116 @@ const getTaskById = asyncHandler(async (req, res) => {
 
 const updateTask = asyncHandler(async (req, res) => {
   //chai
+  const { taskId } = req.params;
+  const { title, description, status, assignedTo } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(taskId)) {
+    throw new ApiError(400, "Invalid taskId");
+  }
+
+  const updateFields = {};
+
+  if (title) updateFields.title = title;
+  if (description) updateFields.description = description;
+  if (status) updateFields.status = status;
+
+  const updatedTask = await Task.findByIdAndUpdate(
+    taskId,
+    {
+      set: updateFields,
+    },
+    { new: true },
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedTask, "Task updated successfully"));
 });
 
 const deleteTask = asyncHandler(async (req, res) => {
   //chai
+  const { taskId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(taskId))
+    throw new ApiError(400, "Invalid task id");
+
+  const deletedTask = await Task.findByIdAndDelete(taskId);
+
+  if (!deletedTask) throw new ApiError(404, "Task not found");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Task deleted successfully"));
 });
 
 const createSubTask = asyncHandler(async (req, res) => {
   //chai
+  const { title, status } = req.body;
+  const { taskId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(taskId))
+    throw new ApiError(400, "Invalid task id");
+
+  const task = await Task.findById(taskId);
+
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  if (!title || !status) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const subtask = new Subtask.create({
+    title,
+    task,
+    status,
+    createdBy: req.user._id,
+  });
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, subtask, "Subtask created successfully"));
 });
 
 const updateSubTask = asyncHandler(async (req, res) => {
   //chai
+  const { subtaskId } = req.params;
+  const { title, status } = req.body;
+
+  if (!mongoose.Tyoes.ObjectId.isValid(subtaskId)) {
+    throw new ApiError(400, "Invalid Subtask id");
+  }
+
+  const updatedSubTask = await Subtask.findByIdAndUpdate(
+    subtaskId,
+    {
+      set: { title, status },
+    },
+    { new: true },
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedSubTask, "Subtask updated successfully"));
 });
 
 const deleteSubTask = asyncHandler(async (req, res) => {
   //chai
+  const { subtaskId } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(subtaskId)) {
+    throw new ApiError(400, "Invalid subtask ID");
+  }
+
+  const deleteSubtask = await Subtask.findByIdAndDelete(subtaskId);
+
+  if (!deleteSubtask) {
+    throw new ApiError(404, "Subtask not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Subtask deleted successfully"));
 });
 
 export {
